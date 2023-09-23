@@ -1,8 +1,16 @@
 # Revision history for reflex-dom
 
+## 0.6.3.2-r1
+
+* Require reflex-dom-core >= 0.8.1.0
+
 ## 0.6.3.2
 
 * Build with GHC 9.10
+
+## 0.6.3.1-r1
+
+* Require reflex-dom-core >= 0.8.1.0
 
 ## 0.6.3.1
 

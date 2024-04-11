@@ -71,7 +71,7 @@ library
     cpp-options: -DANDROID
     build-tools: hsc2hs
   build-depends:
-    base >= 4.7 && < 4.15,
+    base >= 4.7 && < 4.16,
     bytestring == 0.10.*,
     reflex >= 0.8 && < 1,
     reflex-dom-core >= 0.6.1.0 && <0.9,

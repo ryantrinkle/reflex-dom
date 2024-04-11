@@ -68,7 +68,7 @@ library
   hs-source-dirs: src
   build-depends:
     aeson >= 0.8 && < 2.2,
-    base >= 4.7 && < 4.17,
+    base >= 4.7 && < 4.18,
     bifunctors >= 4.2 && < 6,
     bimap >= 0.3 && < 0.5,
     blaze-builder >= 0.4.1 && < 0.5,
@@ -170,7 +170,7 @@ library
   if flag(use-template-haskell)
     build-depends:
       dependent-sum-template >= 0.1 && < 0.2,
-      template-haskell >= 2.12.0 && < 2.19
+      template-haskell >= 2.12.0 && < 2.20
     other-extensions: TemplateHaskell
     cpp-options: -DUSE_TEMPLATE_HASKELL
     other-modules:
@@ -226,7 +226,7 @@ test-suite hydration
                , websockets
                , which
   hs-source-dirs: test
-  ghc-options: -rtsopts -with-rtsopts=-T -Wall -fwarn-tabs -funbox-strict-fields -O2 -ferror-spans
+  ghc-options: -rtsopts "-with-rtsopts=-T -V0" -Wall -fwarn-tabs -funbox-strict-fields -O2 -ferror-spans
   ghc-prof-options: -fprof-auto -optP-DPROFILING
   main-is: hydration.hs
   type: exitcode-stdio-1.0

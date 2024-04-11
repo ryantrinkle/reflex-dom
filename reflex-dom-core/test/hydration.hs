@@ -121,17 +121,10 @@ assertBool msg bool = liftIO $ HUnit.assertBool msg bool
 chromeConfig :: Text -> [Text] -> WD.WDConfig
 chromeConfig fp flags = WD.useBrowser (WD.chrome { WD.chromeBinary = Just $ T.unpack fp, WD.chromeOptions = T.unpack <$> flags }) WD.defaultConfig
 
-keyMap :: DMap DKey Identity
-keyMap = DMap.fromList
-  [ Key_Int ==> 0
-  , Key_Char ==> 'A'
-  ]
-
 data DKey a where
   Key_Int :: DKey Int
   Key_Char :: DKey Char
   Key_Bool :: DKey Bool
-
 
 textKey :: DKey a -> Text
 textKey = \case
@@ -143,6 +136,21 @@ deriveArgDict ''DKey
 deriveGEq ''DKey
 deriveGCompare ''DKey
 deriveGShow ''DKey
+
+keyMap :: DMap DKey Identity
+keyMap = DMap.fromList
+  [ Key_Int ==> 0
+  , Key_Char ==> 'A'
+  ]
+
+data Key2 a where
+  Key2_Int :: Int -> Key2 Int
+  Key2_Char :: Char -> Key2 Char
+
+deriveGEq ''Key2
+deriveGCompare ''Key2
+deriveGShow ''Key2
+deriveArgDict ''Key2
 
 deriving instance MonadFail WD
 
@@ -1820,12 +1828,3 @@ withAsync' f g = bracket
   (liftIO $ Async.async f)
   (liftIO . Async.uninterruptibleCancel)
   (const g)
-
-data Key2 a where
-  Key2_Int :: Int -> Key2 Int
-  Key2_Char :: Char -> Key2 Char
-
-deriveGEq ''Key2
-deriveGCompare ''Key2
-deriveGShow ''Key2
-deriveArgDict ''Key2

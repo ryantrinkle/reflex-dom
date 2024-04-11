@@ -15,8 +15,8 @@ library
   hs-source-dirs: src
   build-depends:
     async,
-    base >= 4.7 && < 4.16,
-    bytestring == 0.10.*,
+    base >= 4.7 && < 4.17,
+    bytestring >= 0.10 && < 0.12,
     chrome-test-utils,
     exceptions,
     -- Until hspec-webdriver supports newer hspec-core versions

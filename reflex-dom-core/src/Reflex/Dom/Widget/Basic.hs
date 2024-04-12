@@ -72,6 +72,7 @@ import Reflex.Workflow
 
 import Control.Arrow
 import Control.Lens hiding (children, element)
+import Control.Monad.Fix
 import Control.Monad.Reader hiding (forM, forM_, mapM, mapM_, sequence, sequence_)
 import Data.Align
 import Data.Default

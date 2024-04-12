@@ -19,6 +19,8 @@ import Data.IORef (IORef)
 import Blaze.ByteString.Builder.Html.Utf8
 import Control.Lens hiding (element)
 import Control.Monad.Exception
+import Control.Monad
+import Control.Monad.Fix
 import Control.Monad.Identity
 import Control.Monad.Primitive
 import Control.Monad.Ref

@@ -1,4 +1,5 @@
 {-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -89,8 +90,10 @@ import qualified Test.WebDriver.Capabilities as WD
 import Test.Util.ChromeFlags
 import Test.Util.UnshareNetwork
 
--- ORPHAN: https://github.com/kallisti-dev/hs-webdriver/pull/167
+
+#if !MIN_VERSION_webdriver(0,10,0)
 deriving instance MonadMask WD
+#endif
 
 chromium :: FilePath
 chromium = $(staticWhich "chromium")
@@ -166,11 +169,11 @@ tests withDebugging wdConfig caps _selenium = do
         r <- m
         putStrLnDebug "after"
         return r
-      testWidgetStatic :: WD b -> (forall m js. TestWidget (SpiderTimeline Global) m => m ()) -> WD b
+      testWidgetStatic :: WD b -> (forall m. TestWidget (SpiderTimeline Global) m => m ()) -> WD b
       testWidgetStatic = testWidgetStaticDebug withDebugging
-      testWidget :: WD () -> WD b -> (forall m js. TestWidget (SpiderTimeline Global) m => m ()) -> WD b
+      testWidget :: WD () -> WD b -> (forall m. TestWidget (SpiderTimeline Global) m => m ()) -> WD b
       testWidget = testWidgetDebug True withDebugging
-      testWidget' :: WD a -> (a -> WD b) -> (forall m js. TestWidget (SpiderTimeline Global) m => m ()) -> WD b
+      testWidget' :: WD a -> (a -> WD b) -> (forall m. TestWidget (SpiderTimeline Global) m => m ()) -> WD b
       testWidget' = testWidgetDebug' True withDebugging
   session' "text" $ do
     it "works" $ runWD $ do
@@ -1722,7 +1725,7 @@ testWidgetStaticDebug
   :: Bool
   -> WD b
   -- ^ Webdriver commands to run before JS runs and after hydration switchover
-  -> (forall m js. TestWidget (SpiderTimeline Global) m => m ())
+  -> (forall m. TestWidget (SpiderTimeline Global) m => m ())
   -- ^ Widget we are testing
   -> WD b
 testWidgetStaticDebug withDebugging w = testWidgetDebug True withDebugging (void w) w
@@ -1735,7 +1738,7 @@ testWidgetDebug
   -- ^ Webdriver commands to run before the JS runs (i.e. on the statically rendered page)
   -> WD b
   -- ^ Webdriver commands to run after hydration switchover
-  -> (forall m js. TestWidget (SpiderTimeline Global) m => m ())
+  -> (forall m. TestWidget (SpiderTimeline Global) m => m ())
   -- ^ Widget we are testing
   -> WD b
 testWidgetDebug hardFailure withDebugging beforeJS afterSwitchover =
@@ -1752,7 +1755,7 @@ testWidgetDebug'
   -- ^ Webdriver commands to run before the JS runs (i.e. on the statically rendered page)
   -> (a -> WD b)
   -- ^ Webdriver commands to run after hydration switchover
-  -> (forall m js. TestWidget (SpiderTimeline Global) m => m ())
+  -> (forall m. TestWidget (SpiderTimeline Global) m => m ())
   -- ^ Widget we are testing (contents of body)
   -> WD b
 testWidgetDebug' hardFailure withDebugging beforeJS afterSwitchover bodyWidget = do

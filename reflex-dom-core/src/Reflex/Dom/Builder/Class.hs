@@ -47,6 +47,7 @@ import Reflex.Requester.Base
 
 import qualified Control.Category
 import Control.Lens hiding (element)
+import Control.Monad.Fix
 import Control.Monad.Reader
 import qualified Control.Monad.State as Lazy
 import Control.Monad.State.Strict
@@ -307,6 +308,15 @@ inputElementConfig_elementConfig f (InputElementConfig a b c d e) = (\e' -> Inpu
 {-# INLINE inputElementConfig_elementConfig #-}
 #endif
 
+instance (Reflex t, er ~ EventResult, DomSpace s) => Default (ElementConfig er t s) where
+  {-# INLINABLE def #-}
+  def = ElementConfig
+    { _elementConfig_namespace = Nothing
+    , _elementConfig_initialAttributes = mempty
+    , _elementConfig_modifyAttributes = Nothing
+    , _elementConfig_eventSpec = def
+    }
+
 instance (Reflex t, er ~ EventResult, DomSpace s) => Default (InputElementConfig er t s) where
   {-# INLINABLE def #-}
   def = InputElementConfig
@@ -541,15 +551,6 @@ class HasNamespace a where
 instance HasNamespace (ElementConfig er t m) where
   {-# INLINABLE namespace #-}
   namespace = elementConfig_namespace
-
-instance (Reflex t, er ~ EventResult, DomSpace s) => Default (ElementConfig er t s) where
-  {-# INLINABLE def #-}
-  def = ElementConfig
-    { _elementConfig_namespace = Nothing
-    , _elementConfig_initialAttributes = mempty
-    , _elementConfig_modifyAttributes = Nothing
-    , _elementConfig_eventSpec = def
-    }
 
 instance (DomBuilder t m, PerformEvent t m, MonadFix m, MonadHold t m) => DomBuilder t (PostBuildT t m) where
   type DomBuilderSpace (PostBuildT t m) = DomBuilderSpace m

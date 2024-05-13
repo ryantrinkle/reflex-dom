@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE ForeignFunctionInterface #-}
 {-# LANGUAGE JavaScriptFFI #-}
 
@@ -9,7 +10,11 @@ module Foreign.JavaScript.Internal.Utils
 
 import GHCJS.Concurrent
 import GHCJS.DOM.Types (JSM, JSVal, RequestAnimationFrameCallback (..))
+#ifdef __GHCJS__
 import GHCJS.Foreign.Callback (releaseCallback)
+#else
+import GHC.JS.Foreign.Callback (releaseCallback)
+#endif
 
 freeRequestAnimationFrameCallback :: RequestAnimationFrameCallback -> JSM ()
 freeRequestAnimationFrameCallback (RequestAnimationFrameCallback cb) = releaseCallback cb

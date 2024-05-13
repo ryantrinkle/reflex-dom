@@ -102,11 +102,11 @@ library
     network-uri >= 2.6.1 && < 2.7,
     zenc == 0.1.*
 
-  if impl(ghcjs)
+  if impl(ghcjs) || arch(javascript)
     hs-source-dirs: src-ghcjs
     build-depends:
       ghcjs-base,
-      hashable >= 1.2 && < 1.4
+      hashable >= 1.2 && < 1.5
   else
     hs-source-dirs: src-ghc
     if !os(windows)

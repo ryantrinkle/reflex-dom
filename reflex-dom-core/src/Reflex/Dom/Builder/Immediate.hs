@@ -120,6 +120,7 @@ module Reflex.Dom.Builder.Immediate
 import Control.Concurrent
 import Control.Exception (bracketOnError)
 import Control.Lens (Identity(..), imapM_, iforM_, (^.), makeLenses)
+import Control.Monad
 import Control.Monad.Exception
 import Control.Monad.Primitive
 import Control.Monad.Reader
@@ -206,6 +207,7 @@ import qualified Reflex.Patch.DMap as PatchDMap
 import qualified Reflex.Patch.DMapWithMove as PatchDMapWithMove
 import qualified Reflex.Patch.MapWithMove as PatchMapWithMove
 import qualified Reflex.TriggerEvent.Base as TriggerEventT (askEvents)
+import Control.Monad.Fix
 
 #ifndef USE_TEMPLATE_HASKELL
 import Data.Functor.Contravariant (phantom)

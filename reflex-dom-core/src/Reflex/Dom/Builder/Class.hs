@@ -47,6 +47,7 @@ import Reflex.Requester.Base
 
 import qualified Control.Category
 import Control.Lens hiding (element)
+import Control.Monad.Fix
 import Control.Monad.Reader
 import qualified Control.Monad.State as Lazy
 import Control.Monad.State.Strict
@@ -314,7 +315,7 @@ instance (Reflex t, er ~ EventResult, DomSpace s) => Default (InputElementConfig
     , _inputElementConfig_setValue = Nothing
     , _inputElementConfig_initialChecked = False
     , _inputElementConfig_setChecked = Nothing
-    , _inputElementConfig_elementConfig = def
+    , _inputElementConfig_elementConfig = def :: ElementConfig EventResult t s
     }
 
 data InputElement er d t
@@ -352,7 +353,7 @@ instance (Reflex t, er ~ EventResult, DomSpace s) => Default (TextAreaElementCon
   def = TextAreaElementConfig
     { _textAreaElementConfig_initialValue = ""
     , _textAreaElementConfig_setValue = Nothing
-    , _textAreaElementConfig_elementConfig = def
+    , _textAreaElementConfig_elementConfig = def :: ElementConfig EventResult t s
     }
 
 data TextAreaElement er d t
@@ -413,7 +414,7 @@ instance (Reflex t, er ~ EventResult, DomSpace s) => Default (SelectElementConfi
   def = SelectElementConfig
     { _selectElementConfig_initialValue = ""
     , _selectElementConfig_setValue = Nothing
-    , _selectElementConfig_elementConfig = def
+    , _selectElementConfig_elementConfig = def :: ElementConfig EventResult t s
     }
 
 data SelectElement er d t = SelectElement
@@ -423,6 +424,15 @@ data SelectElement er d t = SelectElement
   , _selectElement_hasFocus :: Dynamic t Bool
   , _selectElement_raw :: RawSelectElement d
   }
+
+instance (Reflex t, er ~ EventResult, DomSpace s) => Default (ElementConfig er t s) where
+  {-# INLINABLE def #-}
+  def = ElementConfig
+    { _elementConfig_namespace = Nothing
+    , _elementConfig_initialAttributes = mempty
+    , _elementConfig_modifyAttributes = Nothing
+    , _elementConfig_eventSpec = def
+    }
 
 #ifdef USE_TEMPLATE_HASKELL
 concat <$> mapM (uncurry makeLensesWithoutField)
@@ -541,15 +551,6 @@ class HasNamespace a where
 instance HasNamespace (ElementConfig er t m) where
   {-# INLINABLE namespace #-}
   namespace = elementConfig_namespace
-
-instance (Reflex t, er ~ EventResult, DomSpace s) => Default (ElementConfig er t s) where
-  {-# INLINABLE def #-}
-  def = ElementConfig
-    { _elementConfig_namespace = Nothing
-    , _elementConfig_initialAttributes = mempty
-    , _elementConfig_modifyAttributes = Nothing
-    , _elementConfig_eventSpec = def
-    }
 
 instance (DomBuilder t m, PerformEvent t m, MonadFix m, MonadHold t m) => DomBuilder t (PostBuildT t m) where
   type DomBuilderSpace (PostBuildT t m) = DomBuilderSpace m

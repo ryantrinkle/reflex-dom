@@ -79,6 +79,7 @@ import Data.Default
 import Data.Either
 import Data.Foldable
 import Data.Functor (void)
+import Data.Kind (Type)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Map.Misc
@@ -342,5 +343,5 @@ tabDisplay ulClass activeClass tabItems = do
         return $ fmap (const k) (_link_clicked a)
 
 class HasAttributes a where
-  type Attrs a :: *
+  type Attrs a :: Type
   attributes :: Lens' a (Attrs a)

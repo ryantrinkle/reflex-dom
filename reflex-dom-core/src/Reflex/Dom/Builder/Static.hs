@@ -37,6 +37,7 @@ import Data.Functor.Compose
 import Data.Functor.Constant
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as IntMap
+import Data.Kind (Type)
 import qualified Data.Map as Map
 import Data.Map.Misc (applyMap)
 import Data.Maybe (fromMaybe)
@@ -146,7 +147,7 @@ data StaticDomEvent (a :: k)
 -- | Static documents don't process events, so all handlers are equivalent
 data StaticDomHandler (a :: k) (b :: k) = StaticDomHandler
 
-data StaticEventSpec (er :: EventTag -> *) = StaticEventSpec deriving (Generic)
+data StaticEventSpec (er :: EventTag -> Type) = StaticEventSpec deriving (Generic)
 
 instance Default (StaticEventSpec er)
 
@@ -221,7 +222,7 @@ hoistIntMapWithKeyWithAdjust base f im0 im' = do
       sample o
   return (result0, result')
 
-hoistDMapWithKeyWithAdjust :: forall (k :: * -> *) v v' t m p.
+hoistDMapWithKeyWithAdjust :: forall (k :: Type -> Type) v v' t m p.
   ( Adjustable t m
   , MonadHold t m
   , PatchTarget (p k (Constant (Behavior t Builder))) ~ DMap k (Constant (Behavior t Builder))

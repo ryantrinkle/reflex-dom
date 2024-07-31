@@ -139,6 +139,7 @@ import Data.Functor.Product
 import Data.GADT.Compare (GCompare)
 import Data.IORef
 import Data.IntMap.Strict (IntMap)
+import Data.Kind (Type)
 import Data.Maybe
 import Data.Monoid ((<>))
 import Data.Some (Some(..))
@@ -675,7 +676,7 @@ instance DomSpace GhcjsDomSpace where
 
 newtype GhcjsEventFilter er en = GhcjsEventFilter (GhcjsDomEvent en -> JSM (EventFlags, JSM (Maybe (er en))))
 
-data Pair1 (f :: k -> *) (g :: k -> *) (a :: k) = Pair1 (f a) (g a)
+data Pair1 (f :: k -> Type) (g :: k -> Type) (a :: k) = Pair1 (f a) (g a)
 
 data Maybe1 f a = Nothing1 | Just1 (f a)
 
@@ -1702,7 +1703,7 @@ instance (Adjustable t m, MonadJSM m, MonadHold t m, MonadFix m, PrimMonad m, Ra
 
 {-# INLINABLE traverseDMapWithKeyWithAdjust' #-}
 traverseDMapWithKeyWithAdjust'
-  :: forall s t m (k :: * -> *) v v'. (Adjustable t m, MonadHold t m, MonadFix m, MonadJSM m, PrimMonad m, GCompare k, RawDocument (DomBuilderSpace (HydrationDomBuilderT s t m)) ~ Document)
+  :: forall s t m (k :: Type -> Type) v v'. (Adjustable t m, MonadHold t m, MonadFix m, MonadJSM m, PrimMonad m, GCompare k, RawDocument (DomBuilderSpace (HydrationDomBuilderT s t m)) ~ Document)
   => (forall a. k a -> v a -> HydrationDomBuilderT s t m (v' a))
   -> DMap k v
   -> Event t (PatchDMap k v)

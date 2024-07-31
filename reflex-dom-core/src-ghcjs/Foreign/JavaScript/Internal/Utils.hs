@@ -1,6 +1,5 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE ForeignFunctionInterface #-}
-{-# LANGUAGE JavaScriptFFI #-}
 
 module Foreign.JavaScript.Internal.Utils
   ( synchronously

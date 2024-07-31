@@ -25,7 +25,6 @@
 {-# LANGUAGE UndecidableInstances #-}
 #ifdef ghcjs_HOST_OS
 {-# LANGUAGE ForeignFunctionInterface #-}
-{-# LANGUAGE JavaScriptFFI #-}
 #endif
 -- | This is a builder to be used on the client side. It can be run in two modes:
 --

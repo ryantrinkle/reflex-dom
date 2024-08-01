@@ -22,12 +22,14 @@
 {-# LANGUAGE TemplateHaskell #-}
 #endif
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
+
 module Reflex.Dom.Builder.Class
-       ( module Reflex.Dom.Builder.Class
-       , module Reflex.Dom.Builder.Class.Events
-       , module Reflex.NotReady.Class
-       ) where
+  ( module Reflex.Dom.Builder.Class
+  , module Reflex.Dom.Builder.Class.Events
+  , module Reflex.NotReady.Class
+  ) where
 
 import Reflex.Adjustable.Class
 import Reflex.Class as Reflex
@@ -59,7 +61,6 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Maybe
 import Data.Proxy
-import Data.Semigroup
 import Data.Semigroup.Commutative
 import Data.String
 import Data.Text (Text)

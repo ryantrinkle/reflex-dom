@@ -130,7 +130,6 @@ import Data.Bitraversable
 import Data.Default
 import Data.Dependent.Map (DMap)
 import Data.Dependent.Sum
-import Data.FastMutableIntMap (PatchIntMap (..))
 import Data.Foldable (for_, traverse_)
 import Data.Functor.Compose
 import Data.Functor.Constant
@@ -141,7 +140,6 @@ import Data.IORef
 import Data.IntMap.Strict (IntMap)
 import Data.Kind (Type)
 import Data.Maybe
-import Data.Monoid ((<>))
 import Data.Some (Some(..))
 import Data.String (IsString)
 import Data.Text (Text)
@@ -154,7 +152,7 @@ import GHCJS.DOM.EventM (EventM, event, on)
 import GHCJS.DOM.KeyboardEvent as KeyboardEvent
 import GHCJS.DOM.MouseEvent
 import GHCJS.DOM.Node (appendChild_, getOwnerDocumentUnchecked, getParentNodeUnchecked, setNodeValue, toNode)
-import GHCJS.DOM.Types (liftJSM, askJSM, runJSM, JSM, MonadJSM, FocusEvent, IsElement, IsEvent, IsNode, KeyboardEvent, Node, TouchEvent, WheelEvent, uncheckedCastTo, ClipboardEvent)
+import GHCJS.DOM.Types (liftJSM, askJSM, runJSM, JSM, MonadJSM, FocusEvent, IsElement, IsEvent, IsNode, Node, TouchEvent, WheelEvent, uncheckedCastTo)
 import GHCJS.DOM.UIEvent
 #ifndef ghcjs_HOST_OS
 import Language.Javascript.JSaddle (call, eval) -- Avoid using eval in ghcjs. Use ffi instead
@@ -164,7 +162,6 @@ import Reflex.Class as Reflex
 import Reflex.Dom.Builder.Class
 import Reflex.Dynamic
 import Reflex.Host.Class
-import Reflex.Patch.DMapWithMove (PatchDMapWithMove(..))
 import Reflex.Patch.MapWithMove (PatchMapWithMove(..))
 import Reflex.PerformEvent.Base (PerformEventT)
 import Reflex.PerformEvent.Class

@@ -13,6 +13,7 @@
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
+
 module Reflex.Dom.Builder.Static where
 
 import Data.IORef (IORef)
@@ -21,7 +22,6 @@ import Control.Lens hiding (element)
 import Control.Monad
 import Control.Monad.Exception
 import Control.Monad.Fix
-import Control.Monad.Identity
 import Control.Monad.Primitive
 import Control.Monad.Ref
 import Control.Monad.State.Strict
@@ -41,7 +41,6 @@ import Data.Kind (Type)
 import qualified Data.Map as Map
 import Data.Map.Misc (applyMap)
 import Data.Maybe (fromMaybe)
-import Data.Monoid ((<>))
 import qualified Data.Set as Set
 import Data.Text (Text)
 import qualified Data.Text as T

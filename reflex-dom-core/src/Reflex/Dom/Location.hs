@@ -3,6 +3,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
+
 module Reflex.Dom.Location
   ( browserHistoryWith
   , getLocationAfterHost
@@ -28,7 +29,6 @@ import Control.Lens ((^.))
 import Control.Monad ((>=>))
 import Control.Monad.Fix (MonadFix)
 import Data.Align (align)
-import Data.Monoid
 import Data.Text (Text)
 import Data.These (These(..))
 import qualified GHCJS.DOM as DOM

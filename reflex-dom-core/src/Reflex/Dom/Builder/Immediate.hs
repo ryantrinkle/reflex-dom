@@ -25,7 +25,11 @@
 {-# LANGUAGE UndecidableInstances #-}
 #ifdef ghcjs_HOST_OS
 {-# LANGUAGE ForeignFunctionInterface #-}
+#ifdef __GHCJS__
+{-# LANGUAGE JavaScriptFFI #-}
 #endif
+#endif
+
 -- | This is a builder to be used on the client side. It can be run in two modes:
 --
 --  1. in "hydration mode", reusing DOM nodes already in the page (as produced
@@ -157,24 +161,6 @@ import GHCJS.DOM.UIEvent
 #ifndef ghcjs_HOST_OS
 import Language.Javascript.JSaddle (call, eval) -- Avoid using eval in ghcjs. Use ffi instead
 #endif
-import Reflex.Adjustable.Class
-import Reflex.Class as Reflex
-import Reflex.Dom.Builder.Class
-import Reflex.Dynamic
-import Reflex.Host.Class
-import Reflex.Patch.MapWithMove (PatchMapWithMove(..))
-import Reflex.PerformEvent.Base (PerformEventT)
-import Reflex.PerformEvent.Class
-import Reflex.PostBuild.Base (PostBuildT)
-import Reflex.PostBuild.Class
-#ifdef PROFILE_REFLEX
-import Reflex.Profiled
-#endif
-import Reflex.Requester.Base
-import Reflex.Requester.Class
-import Reflex.Spider (Spider, SpiderHost, Global)
-import Reflex.TriggerEvent.Base hiding (askEvents)
-import Reflex.TriggerEvent.Class
 
 import qualified Data.Dependent.Map as DMap
 import qualified Data.FastMutableIntMap as FastMutableIntMap
@@ -201,6 +187,31 @@ import qualified GHCJS.DOM.TouchList as TouchList
 import qualified GHCJS.DOM.Types as DOM
 import qualified GHCJS.DOM.Window as Window
 import qualified GHCJS.DOM.WheelEvent as WheelEvent
+
+#if !MIN_VERSION_base(4,18,0)
+import Data.FastMutableIntMap (PatchIntMap (..))
+import Data.Monoid ((<>))
+import GHCJS.DOM.Types (KeyboardEvent, ClipboardEvent)
+#endif
+
+import Reflex.Adjustable.Class
+import Reflex.Class as Reflex
+import Reflex.Dom.Builder.Class
+import Reflex.Dynamic
+import Reflex.Host.Class
+import Reflex.Patch.MapWithMove (PatchMapWithMove(..))
+import Reflex.PerformEvent.Base (PerformEventT)
+import Reflex.PerformEvent.Class
+import Reflex.PostBuild.Base (PostBuildT)
+import Reflex.PostBuild.Class
+#ifdef PROFILE_REFLEX
+import Reflex.Profiled
+#endif
+import Reflex.Requester.Base
+import Reflex.Requester.Class
+import Reflex.Spider (Spider, SpiderHost, Global)
+import Reflex.TriggerEvent.Base hiding (askEvents)
+import Reflex.TriggerEvent.Class
 import qualified Reflex.Patch.DMap as PatchDMap
 import qualified Reflex.Patch.DMapWithMove as PatchDMapWithMove
 import qualified Reflex.Patch.MapWithMove as PatchMapWithMove

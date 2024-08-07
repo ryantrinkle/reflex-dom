@@ -1,5 +1,8 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE ForeignFunctionInterface #-}
+#ifdef __GHCJS__
+{-# LANGUAGE JavaScriptFFI #-}
+#endif
 
 module Foreign.JavaScript.Internal.Utils
   ( synchronously

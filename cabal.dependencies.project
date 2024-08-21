@@ -3,6 +3,13 @@ allow-newer:
   , which:template-haskell
   , dependent-sum-template:template-haskell
 
+source-repository-package
+  type: git
+  location: https://github.com/ymeister/ghcjs-dom.git
+  tag: 5bff37b7f83072b732eedaea4661083b3d35e4b6
+  subdir: ghcjs-dom-javascript
+  --sha256: 0dxiskgx3f2f4bnkwghk0kqfp7pp2m5r3pma9dxlhxggj9a95brm
+
 if !arch(javascript)
   source-repository-package
     type: git

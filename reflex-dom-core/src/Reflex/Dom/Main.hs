@@ -12,9 +12,39 @@
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -fspecialise-aggressively #-}
+
 module Reflex.Dom.Main where
 
 import Prelude hiding (concat, mapM, mapM_, sequence, sequence_)
+
+import Control.Concurrent
+import Control.Lens
+import Control.Monad
+#if MIN_VERSION_base(4,18,0)
+import Control.Monad.Reader
+#else
+import Control.Monad.Reader hiding (forM, forM_, mapM, mapM_, sequence, sequence_)
+#endif
+import Control.Monad.Ref
+import Data.ByteString (ByteString)
+import Data.Dependent.Sum (DSum (..))
+import Data.Foldable (for_)
+import Data.IORef
+import Data.Maybe
+import Data.Text (Text)
+import qualified Data.Text as T
+import Data.Text.Encoding
+import GHCJS.DOM
+import GHCJS.DOM.Document
+import GHCJS.DOM.Element
+import GHCJS.DOM.Node
+import GHCJS.DOM.NonElementParentNode
+import GHCJS.DOM.Types (JSM)
+import qualified GHCJS.DOM.Types as DOM
+
+#if !MIN_VERSION_base(4,18,0)
+import Data.Monoid ((<>))
+#endif
 
 import Reflex.Adjustable.Class
 import Reflex.Class
@@ -30,35 +60,9 @@ import Reflex.TriggerEvent.Class
 import Reflex.Profiled
 #endif
 
-import Control.Concurrent
-import Control.Lens
-import Control.Monad
-import Control.Monad.Reader hiding (forM, forM_, mapM, mapM_, sequence, sequence_)
-import Control.Monad.Ref
-import Data.ByteString (ByteString)
-import Data.Dependent.Sum (DSum (..))
-import Data.Foldable (for_)
-import Data.IORef
-import Data.Maybe
-import Data.Monoid ((<>))
-import Data.Text (Text)
-import qualified Data.Text as T
-import Data.Text.Encoding
-import GHCJS.DOM
-import GHCJS.DOM.Document
-import GHCJS.DOM.Element
-import GHCJS.DOM.Node
-import GHCJS.DOM.NonElementParentNode
-import GHCJS.DOM.Types (JSM)
-import qualified GHCJS.DOM.Types as DOM
-
-#ifdef PROFILE_REFLEX
-import Reflex.Profiled
-#endif
-
 {-# INLINE mainHydrationWidgetWithHead #-}
 mainHydrationWidgetWithHead :: (forall x. HydrationWidget x ()) -> (forall x. HydrationWidget x ()) -> JSM ()
-mainHydrationWidgetWithHead = mainHydrationWidgetWithHead'
+mainHydrationWidgetWithHead head' body = mainHydrationWidgetWithHead' head' body
 
 {-# INLINABLE mainHydrationWidgetWithHead' #-}
 -- | Warning: `mainHydrationWidgetWithHead'` is provided only as performance tweak. It is expected to disappear in future releases.
@@ -67,7 +71,7 @@ mainHydrationWidgetWithHead' = mainHydrationWidgetWithSwitchoverAction' (pure ()
 
 {-# INLINE mainHydrationWidgetWithSwitchoverAction #-}
 mainHydrationWidgetWithSwitchoverAction :: JSM () -> (forall x. HydrationWidget x ()) -> (forall x. HydrationWidget x ()) -> JSM ()
-mainHydrationWidgetWithSwitchoverAction = mainHydrationWidgetWithSwitchoverAction'
+mainHydrationWidgetWithSwitchoverAction switchoverAction head' body = mainHydrationWidgetWithSwitchoverAction' switchoverAction head' body
 
 {-# INLINABLE mainHydrationWidgetWithSwitchoverAction' #-}
 -- | Warning: `mainHydrationWidgetWithSwitchoverAction'` is provided only as performance tweak. It is expected to disappear in future releases.
@@ -187,7 +191,7 @@ runHydrationWidgetWithHeadAndBodyWithFailure onFailure switchoverAction app = wi
 
 {-# INLINE mainWidget #-}
 mainWidget :: (forall x. Widget x ()) -> JSM ()
-mainWidget = mainWidget'
+mainWidget w = mainWidget' w
 
 {-# INLINABLE mainWidget' #-}
 -- | Warning: `mainWidget'` is provided only as performance tweak. It is expected to disappear in future releases.

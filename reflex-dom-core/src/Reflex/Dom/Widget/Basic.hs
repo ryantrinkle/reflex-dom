@@ -1,4 +1,5 @@
 {-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -9,6 +10,7 @@
 {-# LANGUAGE RecursiveDo #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
+
 module Reflex.Dom.Widget.Basic
   (
   -- * Displaying Values
@@ -60,24 +62,15 @@ module Reflex.Dom.Widget.Basic
   , partitionMapBySetLT
   ) where
 
-import Reflex.Adjustable.Class
-import Reflex.Class
-import Reflex.Collection
-import Reflex.Dom.Builder.Class
-import Reflex.Dom.Class
-import Reflex.Dynamic
-import Reflex.Network
-import Reflex.PostBuild.Class
-import Reflex.Workflow
+import Prelude hiding (mapM, mapM_, sequence, sequence_)
 
-import Control.Arrow
 import Control.Lens hiding (children, element)
-import Control.Monad.Reader hiding (forM, forM_, mapM, mapM_, sequence, sequence_)
+import Control.Monad.Fix
 import Data.Align
 import Data.Default
-import Data.Either
 import Data.Foldable
 import Data.Functor (void)
+import Data.Kind (Type)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Map.Misc
@@ -88,7 +81,22 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import Data.These
 import Data.Traversable
-import Prelude hiding (mapM, mapM_, sequence, sequence_)
+
+#if !MIN_VERSION_base(4,18,0)
+import Control.Arrow
+import Control.Monad.Reader hiding (forM, forM_, mapM, mapM_, sequence, sequence_)
+import Data.Either
+#endif
+
+import Reflex.Adjustable.Class
+import Reflex.Class
+import Reflex.Collection
+import Reflex.Dom.Builder.Class
+import Reflex.Dom.Class
+import Reflex.Dynamic
+import Reflex.Network
+import Reflex.PostBuild.Class
+import Reflex.Workflow
 
 -- | Breaks the given Map into pieces based on the given Set.  Each piece will contain only keys that are less than the key of the piece, and greater than or equal to the key of the piece with the next-smaller key.  There will be one additional piece containing all keys from the original Map that are larger or equal to the largest key in the Set.
 -- Either k () is used instead of Maybe k so that the resulting map of pieces is sorted so that the additional piece has the largest key.
@@ -341,5 +349,5 @@ tabDisplay ulClass activeClass tabItems = do
         return $ fmap (const k) (_link_clicked a)
 
 class HasAttributes a where
-  type Attrs a :: *
+  type Attrs a :: Type
   attributes :: Lens' a (Attrs a)

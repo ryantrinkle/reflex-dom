@@ -1,0 +1,27 @@
+allow-newer:
+    which:base
+  , which:template-haskell
+  , dependent-sum-template:template-haskell
+
+source-repository-package
+  type: git
+  location: https://github.com/ymeister/ghcjs-dom.git
+  tag: 5bff37b7f83072b732eedaea4661083b3d35e4b6
+  subdir: ghcjs-dom-javascript
+  --sha256: 0dxiskgx3f2f4bnkwghk0kqfp7pp2m5r3pma9dxlhxggj9a95brm
+
+if !arch(javascript)
+  source-repository-package
+    type: git
+    location: https://github.com/ndmitchell/hlint.git
+    tag: 49f47288040400f1a4c4af71646d2037fdbbd72b
+    --sha256: sha256-gHVNiyYkCX8DKzOEt2HeV+2v/AyafpjsgfZbZjHo0lM=
+
+  source-repository-package
+    type: git
+    location: https://github.com/gtk2hs/webkit-javascriptcore.git
+    tag: 0.14.4.6
+    --sha256: sha256-AHqqMG7RkCZGjtEKXD94VAzxa8vP0K4LMX9ZjUyPC5M=
+
+  package webkit2gtk3-javascriptcore
+    documentation: false

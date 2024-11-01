@@ -1,12 +1,13 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE OverloadedStrings #-}
+
 module Reflex.Dom.Xhr.FormData
   ( postForms
   , postForms'
   , FormValue (..)
   , fileToFormValue
-  )
-  where
+  ) where
 
 import Control.Lens
 import Data.Default
@@ -14,10 +15,14 @@ import Data.Map (Map)
 import Data.Text (Text)
 import Data.Traversable
 import qualified GHCJS.DOM.FormData as FD
-import Foreign.JavaScript.TH
 import GHCJS.DOM.File (getName)
 import GHCJS.DOM.Types (File, IsBlob)
 import Language.Javascript.JSaddle.Monad (MonadJSM, liftJSM)
+
+#if !MIN_VERSION_base(4,18,0)
+import Foreign.JavaScript.TH
+#endif
+
 import Reflex
 import Reflex.Dom.Xhr
 

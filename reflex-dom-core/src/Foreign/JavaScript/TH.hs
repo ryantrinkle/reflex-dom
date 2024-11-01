@@ -10,13 +10,17 @@
 {-# LANGUAGE UndecidableInstances #-}
 #ifdef ghcjs_HOST_OS
 {-# LANGUAGE ForeignFunctionInterface #-}
+#ifdef __GHCJS__
 {-# LANGUAGE JavaScriptFFI #-}
 #endif
-module Foreign.JavaScript.TH ( module Foreign.JavaScript.TH
-#ifdef USE_TEMPLATE_HASKELL
-                             , Safety (..)
 #endif
-                             ) where
+
+module Foreign.JavaScript.TH
+  ( module Foreign.JavaScript.TH
+#ifdef USE_TEMPLATE_HASKELL
+  , Safety (..)
+#endif
+  ) where
 
 import Foreign.JavaScript.Orphans ()
 import Prelude hiding ((!!))
@@ -31,8 +35,9 @@ import Language.Haskell.TH
 
 import GHCJS.DOM.Types (JSContextRef, askJSM)
 #ifdef ghcjs_HOST_OS
-import qualified GHCJS.Buffer as JS
 import GHCJS.DOM.Types (MonadJSM)
+#ifdef __GHCJS__
+import qualified GHCJS.Buffer as JS
 import qualified GHCJS.DOM.Types as JS
 import qualified GHCJS.Foreign as JS
 import qualified GHCJS.Foreign.Callback as JS
@@ -48,6 +53,8 @@ import Data.Word
 import Foreign.C.Types
 import Foreign.Ptr
 import Text.Encoding.Z
+#endif
+
 #else
 import GHCJS.DOM.Types (MonadJSM (..), runJSM)
 #endif

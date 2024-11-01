@@ -1,10 +1,26 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecursiveDo #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+
 module Reflex.Dom.Widget.Lazy where
+
+import Control.Monad.Fix
+import Data.Fixed
+import Data.Map (Map)
+import qualified Data.Map as Map
+import Data.Text (Text)
+import qualified Data.Text as T
+import GHCJS.DOM.Element
+import GHCJS.DOM.Types (MonadJSM)
+
+#if !MIN_VERSION_base(4,18,0)
+import Data.Monoid
+#endif
 
 import Reflex.Class
 import Reflex.Collection
@@ -15,16 +31,6 @@ import Reflex.Dom.Widget.Basic
 import Reflex.Dynamic
 import Reflex.PerformEvent.Class
 import Reflex.PostBuild.Class
-
-import Control.Monad.Fix
-import Data.Fixed
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Data.Monoid
-import Data.Text (Text)
-import qualified Data.Text as T
-import GHCJS.DOM.Element
-import GHCJS.DOM.Types (MonadJSM)
 
 -- |A list view for long lists. Creates a scrollable element and only renders child row elements near the current scroll position.
 virtualListWithSelection :: forall t m k v. (DomBuilder t m, PostBuild t m, MonadHold t m, PerformEvent t m, MonadJSM (Performable m), DomBuilderSpace m ~ GhcjsDomSpace, MonadFix m, Ord k, Eq v)

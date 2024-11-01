@@ -1,8 +1,10 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RankNTypes #-}
+
 module Reflex.Dom.Location
   ( browserHistoryWith
   , getLocationAfterHost
@@ -21,14 +23,10 @@ module Reflex.Dom.Location
   , popHistoryState
   ) where
 
-import Reflex
-import Reflex.Dom.Builder.Immediate (wrapDomEvent)
-
 import Control.Lens ((^.))
 import Control.Monad ((>=>))
 import Control.Monad.Fix (MonadFix)
 import Data.Align (align)
-import Data.Monoid
 import Data.Text (Text)
 import Data.These (These(..))
 import qualified GHCJS.DOM as DOM
@@ -42,6 +40,13 @@ import qualified GHCJS.DOM.Window as Window
 import qualified GHCJS.DOM.WindowEventHandlers as DOM
 import Language.Javascript.JSaddle (FromJSString, MonadJSM, ToJSString, fromJSValUnchecked, js1, ToJSVal (..), FromJSVal (..))
 import Network.URI
+
+#if !MIN_VERSION_base(4,18,0)
+import Data.Monoid
+#endif
+
+import Reflex
+import Reflex.Dom.Builder.Immediate (wrapDomEvent)
 
 withLocation :: (MonadJSM m) => (Location -> m a) -> m a
 withLocation f = DOM.currentWindowUnchecked >>= Window.getLocation >>= f

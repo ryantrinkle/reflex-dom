@@ -13,12 +13,18 @@
 {-# LANGUAGE TemplateHaskell #-}
 #endif
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
-module Reflex.Dom.Widget.Input (module Reflex.Dom.Widget.Input, def, (&), (.~)) where
+
+module Reflex.Dom.Widget.Input
+  ( module Reflex.Dom.Widget.Input
+  , def, (&), (.~)
+  ) where
 
 import Prelude
 
 import Control.Lens hiding (element, ix)
+import Control.Monad
 import Control.Monad.Fix
 import Control.Monad.IO.Class
 import Control.Monad.Reader
@@ -27,16 +33,25 @@ import Data.Default
 import Data.Dependent.Map (DMap)
 import qualified Data.Dependent.Map as DMap
 import Data.Functor.Misc
+import Data.Kind (Type)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Maybe
-import Data.Semigroup
 import Data.Text (Text)
 import qualified Data.Text as T
+import qualified Text.Read as T
+
+#if !MIN_VERSION_base(4,18,0)
+import Data.Semigroup
+#endif
+
+import qualified GHCJS.DOM.Event as Event
+import qualified GHCJS.DOM.HTMLInputElement as Input
 import GHCJS.DOM.HTMLInputElement (HTMLInputElement)
 import GHCJS.DOM.HTMLTextAreaElement (HTMLTextAreaElement)
 import GHCJS.DOM.Types (MonadJSM, File, uncheckedCastTo)
 import qualified GHCJS.DOM.Types as DOM (HTMLElement(..), EventTarget(..))
+
 import Reflex.Class
 import Reflex.Collection
 import Reflex.Dom.Builder.Class
@@ -46,10 +61,6 @@ import Reflex.Dom.Widget.Basic
 import Reflex.Dynamic
 import Reflex.PostBuild.Class
 import Reflex.TriggerEvent.Class
-import qualified Text.Read as T
-
-import qualified GHCJS.DOM.Event as Event
-import qualified GHCJS.DOM.HTMLInputElement as Input
 
 {-# DEPRECATED TextInput, _textInput_element, TextInputConfig, textInput "Use 'inputElement' directly" #-}
 data TextInput t
@@ -232,7 +243,7 @@ checkbox checked config = do
     , _checkbox_change = _inputElement_checkedChange i
     }
 
-type family CheckboxViewEventResultType (en :: EventTag) :: * where
+type family CheckboxViewEventResultType (en :: EventTag) :: Type where
   CheckboxViewEventResultType 'ClickTag = Bool
   CheckboxViewEventResultType t = EventResultType t
 
@@ -368,7 +379,7 @@ instance Reflex t => Default (DropdownConfig t k) where
                        , _dropdownConfig_attributes = constDyn mempty
                        }
 
-type family DropdownViewEventResultType (en :: EventTag) :: * where
+type family DropdownViewEventResultType (en :: EventTag) :: Type where
   DropdownViewEventResultType 'ChangeTag = Text
   DropdownViewEventResultType t = EventResultType t
 
@@ -648,7 +659,7 @@ instance HasSetValue (CheckboxConfig t) where
   setValue = checkboxConfig_setValue
 
 class HasValue a where
-  type Value a :: *
+  type Value a :: Type
   value :: a -> Value a
 
 instance HasValue (InputElement er d t) where

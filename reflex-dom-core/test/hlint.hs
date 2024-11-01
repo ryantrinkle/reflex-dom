@@ -20,6 +20,7 @@ main = do
     , "--ignore=Unnecessary hiding" -- Interferes with cross-version compatibility
     , "--ignore=Use <$>"
     , "--ignore=Reduce duplication" --TODO: Re-enable this test
+    , "--ignore=Eta reduce" -- simplified subsumption
     , "--ignore=Use list comprehension"
     , "--ignore=Evaluate"
     , "--cpp-define=USE_TEMPLATE_HASKELL"

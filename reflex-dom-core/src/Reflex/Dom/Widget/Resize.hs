@@ -1,10 +1,31 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE RecursiveDo #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
+
 module Reflex.Dom.Widget.Resize where
+
+import Control.Monad.Fix
+import Control.Monad.IO.Class
+import Data.Map (Map)
+import qualified Data.Map as Map
+import Data.Text (Text)
+import qualified Data.Text as T
+import GHCJS.DOM.Element
+import GHCJS.DOM.EventM (on)
+import qualified GHCJS.DOM.GlobalEventHandlers as Events (scroll)
+import GHCJS.DOM.Types (MonadJSM, liftJSM, uncheckedCastTo, HTMLElement(..))
+import GHCJS.DOM.HTMLElement (getOffsetWidth, getOffsetHeight)
+import qualified GHCJS.DOM.Types as DOM
+
+#if !MIN_VERSION_base(4,18,0)
+import Control.Monad
+import Data.Monoid
+#endif
 
 import Reflex.Class
 import Reflex.Time
@@ -15,21 +36,6 @@ import Reflex.Dom.Widget.Basic
 import Reflex.PerformEvent.Class
 import Reflex.PostBuild.Class
 import Reflex.TriggerEvent.Class
-
-import Control.Monad
-import Control.Monad.Fix
-import Control.Monad.IO.Class
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Data.Monoid
-import Data.Text (Text)
-import qualified Data.Text as T
-import GHCJS.DOM.Element
-import GHCJS.DOM.EventM (on)
-import qualified GHCJS.DOM.GlobalEventHandlers as Events (scroll)
-import GHCJS.DOM.Types (MonadJSM, liftJSM, uncheckedCastTo, HTMLElement(..))
-import GHCJS.DOM.HTMLElement (getOffsetWidth, getOffsetHeight)
-import qualified GHCJS.DOM.Types as DOM
 
 -- | A widget that wraps the given widget in a div and fires an event when resized.
 --   Adapted from @github.com\/marcj\/css-element-queries@

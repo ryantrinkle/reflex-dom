@@ -6,6 +6,7 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
+
 module Reflex.Dom.Builder.Hydratable where
 
 import Control.Monad.Fix
@@ -18,9 +19,10 @@ import qualified Data.Map as Map
 #ifndef ghcjs_HOST_OS
 import GHCJS.DOM.Types (MonadJSM (..))
 #endif
+
 import Reflex
 import Reflex.Dom.Builder.Class
-import Reflex.Dom.Builder.Immediate (HasDocument (..), hydratableAttribute)
+import Reflex.Dom.Builder.Immediate (hydratableAttribute)
 import Reflex.Host.Class
 
 -- | A DomBuilder transformer that adds an attribute to all elements such that the

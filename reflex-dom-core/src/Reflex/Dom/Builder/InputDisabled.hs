@@ -6,6 +6,7 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE UndecidableInstances #-}
+
 module Reflex.Dom.Builder.InputDisabled where
 
 import Control.Monad.Fix
@@ -20,7 +21,6 @@ import GHCJS.DOM.Types (MonadJSM (..))
 #endif
 import Reflex
 import Reflex.Dom.Builder.Class
-import Reflex.Dom.Builder.Immediate (HasDocument (..))
 import Reflex.Host.Class
 
 -- | A DomBuilder transformer that disables all 'inputElement's,

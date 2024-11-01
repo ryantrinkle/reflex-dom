@@ -25,8 +25,11 @@
 {-# LANGUAGE UndecidableInstances #-}
 #ifdef ghcjs_HOST_OS
 {-# LANGUAGE ForeignFunctionInterface #-}
+#ifdef __GHCJS__
 {-# LANGUAGE JavaScriptFFI #-}
 #endif
+#endif
+
 -- | This is a builder to be used on the client side. It can be run in two modes:
 --
 --  1. in "hydration mode", reusing DOM nodes already in the page (as produced
@@ -120,7 +123,9 @@ module Reflex.Dom.Builder.Immediate
 import Control.Concurrent
 import Control.Exception (bracketOnError)
 import Control.Lens (Identity(..), imapM_, iforM_, (^.), makeLenses)
+import Control.Monad
 import Control.Monad.Exception
+import Control.Monad.Fix
 import Control.Monad.Primitive
 import Control.Monad.Reader
 import Control.Monad.Ref
@@ -129,7 +134,6 @@ import Data.Bitraversable
 import Data.Default
 import Data.Dependent.Map (DMap)
 import Data.Dependent.Sum
-import Data.FastMutableIntMap (PatchIntMap (..))
 import Data.Foldable (for_, traverse_)
 import Data.Functor.Compose
 import Data.Functor.Constant
@@ -138,8 +142,8 @@ import Data.Functor.Product
 import Data.GADT.Compare (GCompare)
 import Data.IORef
 import Data.IntMap.Strict (IntMap)
+import Data.Kind (Type)
 import Data.Maybe
-import Data.Monoid ((<>))
 import Data.Some (Some(..))
 import Data.String (IsString)
 import Data.Text (Text)
@@ -152,30 +156,11 @@ import GHCJS.DOM.EventM (EventM, event, on)
 import GHCJS.DOM.KeyboardEvent as KeyboardEvent
 import GHCJS.DOM.MouseEvent
 import GHCJS.DOM.Node (appendChild_, getOwnerDocumentUnchecked, getParentNodeUnchecked, setNodeValue, toNode)
-import GHCJS.DOM.Types (liftJSM, askJSM, runJSM, JSM, MonadJSM, FocusEvent, IsElement, IsEvent, IsNode, KeyboardEvent, Node, TouchEvent, WheelEvent, uncheckedCastTo, ClipboardEvent)
+import GHCJS.DOM.Types (liftJSM, askJSM, runJSM, JSM, MonadJSM, FocusEvent, IsElement, IsEvent, IsNode, Node, TouchEvent, WheelEvent, uncheckedCastTo)
 import GHCJS.DOM.UIEvent
 #ifndef ghcjs_HOST_OS
 import Language.Javascript.JSaddle (call, eval) -- Avoid using eval in ghcjs. Use ffi instead
 #endif
-import Reflex.Adjustable.Class
-import Reflex.Class as Reflex
-import Reflex.Dom.Builder.Class
-import Reflex.Dynamic
-import Reflex.Host.Class
-import Reflex.Patch.DMapWithMove (PatchDMapWithMove(..))
-import Reflex.Patch.MapWithMove (PatchMapWithMove(..))
-import Reflex.PerformEvent.Base (PerformEventT)
-import Reflex.PerformEvent.Class
-import Reflex.PostBuild.Base (PostBuildT)
-import Reflex.PostBuild.Class
-#ifdef PROFILE_REFLEX
-import Reflex.Profiled
-#endif
-import Reflex.Requester.Base
-import Reflex.Requester.Class
-import Reflex.Spider (Spider, SpiderHost, Global)
-import Reflex.TriggerEvent.Base hiding (askEvents)
-import Reflex.TriggerEvent.Class
 
 import qualified Data.Dependent.Map as DMap
 import qualified Data.FastMutableIntMap as FastMutableIntMap
@@ -202,6 +187,31 @@ import qualified GHCJS.DOM.TouchList as TouchList
 import qualified GHCJS.DOM.Types as DOM
 import qualified GHCJS.DOM.Window as Window
 import qualified GHCJS.DOM.WheelEvent as WheelEvent
+
+#if !MIN_VERSION_base(4,18,0)
+import Data.FastMutableIntMap (PatchIntMap (..))
+import Data.Monoid ((<>))
+import GHCJS.DOM.Types (KeyboardEvent, ClipboardEvent)
+#endif
+
+import Reflex.Adjustable.Class
+import Reflex.Class as Reflex
+import Reflex.Dom.Builder.Class
+import Reflex.Dynamic
+import Reflex.Host.Class
+import Reflex.Patch.MapWithMove (PatchMapWithMove(..))
+import Reflex.PerformEvent.Base (PerformEventT)
+import Reflex.PerformEvent.Class
+import Reflex.PostBuild.Base (PostBuildT)
+import Reflex.PostBuild.Class
+#ifdef PROFILE_REFLEX
+import Reflex.Profiled
+#endif
+import Reflex.Requester.Base
+import Reflex.Requester.Class
+import Reflex.Spider (Spider, SpiderHost, Global)
+import Reflex.TriggerEvent.Base hiding (askEvents)
+import Reflex.TriggerEvent.Class
 import qualified Reflex.Patch.DMap as PatchDMap
 import qualified Reflex.Patch.DMapWithMove as PatchDMapWithMove
 import qualified Reflex.Patch.MapWithMove as PatchMapWithMove
@@ -464,7 +474,11 @@ removeSubsequentNodes :: (MonadJSM m, IsNode n) => n -> m ()
 #ifdef ghcjs_HOST_OS
 --NOTE: Although wrapping this javascript in a function seems unnecessary, GHCJS's optimizer will break it if it is entered without that wrapping (as of 2021-11-06)
 foreign import javascript unsafe
+#ifdef __GHCJS__
   "(function() { var n = $1; while (n['nextSibling']) { n['parentNode']['removeChild'](n['nextSibling']); }; })()"
+#else
+  "(function(n) { while (n['nextSibling']) { n['parentNode']['removeChild'](n['nextSibling']); }; })"
+#endif
   removeSubsequentNodes_ :: DOM.Node -> IO ()
 removeSubsequentNodes n = liftJSM $ removeSubsequentNodes_ (toNode n)
 #else
@@ -487,7 +501,11 @@ extractBetweenExclusive :: (MonadJSM m, IsNode start, IsNode end) => DOM.Documen
 #ifdef ghcjs_HOST_OS
 --NOTE: Although wrapping this javascript in a function seems unnecessary, GHCJS's optimizer will break it if it is entered without that wrapping (as of 2021-11-06)
 foreign import javascript unsafe
+#ifdef __GHCJS__
   "(function() { var df = $1; var s = $2; var e = $3; var x; for(;;) { x = s['nextSibling']; if(e===x) { break; }; df['appendChild'](x); } })()"
+#else
+  "(function(df, s, e) { var x; for(;;) { x = s['nextSibling']; if(e===x) { break; }; df['appendChild'](x); } })"
+#endif
   extractBetweenExclusive_ :: DOM.DocumentFragment -> DOM.Node -> DOM.Node -> IO ()
 extractBetweenExclusive df s e = liftJSM $ extractBetweenExclusive_ df (toNode s) (toNode e)
 #else
@@ -508,7 +526,11 @@ extractUpTo :: (MonadJSM m, IsNode start, IsNode end) => DOM.DocumentFragment ->
 #ifdef ghcjs_HOST_OS
 --NOTE: Although wrapping this javascript in a function seems unnecessary, GHCJS's optimizer will break it if it is entered without that wrapping (as of 2017-09-04)
 foreign import javascript unsafe
+#ifdef __GHCJS__
   "(function() { var x = $2; while(x !== $3) { var y = x['nextSibling']; $1['appendChild'](x); x = y; } })()"
+#else
+  "(function($1, x, $3) { while(x !== $3) { var y = x['nextSibling']; $1['appendChild'](x); x = y; } })"
+#endif
   extractUpTo_ :: DOM.DocumentFragment -> DOM.Node -> DOM.Node -> IO ()
 extractUpTo df s e = liftJSM $ extractUpTo_ df (toNode s) (toNode e)
 #else
@@ -662,7 +684,7 @@ instance DomSpace GhcjsDomSpace where
 
 newtype GhcjsEventFilter er en = GhcjsEventFilter (GhcjsDomEvent en -> JSM (EventFlags, JSM (Maybe (er en))))
 
-data Pair1 (f :: k -> *) (g :: k -> *) (a :: k) = Pair1 (f a) (g a)
+data Pair1 (f :: k -> Type) (g :: k -> Type) (a :: k) = Pair1 (f a) (g a)
 
 data Maybe1 f a = Nothing1 | Just1 (f a)
 
@@ -1689,7 +1711,7 @@ instance (Adjustable t m, MonadJSM m, MonadHold t m, MonadFix m, PrimMonad m, Ra
 
 {-# INLINABLE traverseDMapWithKeyWithAdjust' #-}
 traverseDMapWithKeyWithAdjust'
-  :: forall s t m (k :: * -> *) v v'. (Adjustable t m, MonadHold t m, MonadFix m, MonadJSM m, PrimMonad m, GCompare k, RawDocument (DomBuilderSpace (HydrationDomBuilderT s t m)) ~ Document)
+  :: forall s t m (k :: Type -> Type) v v'. (Adjustable t m, MonadHold t m, MonadFix m, MonadJSM m, PrimMonad m, GCompare k, RawDocument (DomBuilderSpace (HydrationDomBuilderT s t m)) ~ Document)
   => (forall a. k a -> v a -> HydrationDomBuilderT s t m (v' a))
   -> DMap k v
   -> Event t (PatchDMap k v)

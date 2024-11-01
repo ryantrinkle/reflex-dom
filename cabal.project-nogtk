@@ -7,8 +7,3 @@ package reflex-dom-core
 
 package reflex-dom
   flags: +use-warp -webkit2gtk
-
-source-repository-package
-  type: git
-  location: https://github.com/dfordivam/hspec-webdriver-clone
-  tag: 0d748b7bb7cd74dce0a55a1ec86b01dbb8a71cd8

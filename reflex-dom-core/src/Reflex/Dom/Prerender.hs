@@ -22,6 +22,8 @@ module Reflex.Dom.Prerender
        , PrerenderBaseConstraints
        ) where
 
+import Control.Monad
+import Control.Monad.Fix
 import Control.Monad.Primitive (PrimMonad(..))
 import Control.Monad.Reader
 import Control.Monad.Ref (MonadRef(..), MonadAtomicRef(..))

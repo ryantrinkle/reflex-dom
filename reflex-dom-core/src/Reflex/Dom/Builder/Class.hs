@@ -279,15 +279,6 @@ elementConfig_eventSpec f (ElementConfig a b c d) = (\d' -> ElementConfig a b c 
 {-# INLINE elementConfig_eventSpec #-}
 #endif
 
-instance (Reflex t, er ~ EventResult, DomSpace s) => Default (ElementConfig er t s) where
-  {-# INLINABLE def #-}
-  def = ElementConfig
-    { _elementConfig_namespace = Nothing
-    , _elementConfig_initialAttributes = mempty
-    , _elementConfig_modifyAttributes = Nothing
-    , _elementConfig_eventSpec = def
-    }
-
 data Element er d t
    = Element { _element_events :: EventSelector t (WrapArg er EventName) --TODO: EventSelector should have two arguments
              , _element_raw :: RawElement d
@@ -316,6 +307,15 @@ inputElementConfig_elementConfig :: Lens
 inputElementConfig_elementConfig f (InputElementConfig a b c d e) = (\e' -> InputElementConfig a b c d e') <$> f e
 {-# INLINE inputElementConfig_elementConfig #-}
 #endif
+
+instance (Reflex t, er ~ EventResult, DomSpace s) => Default (ElementConfig er t s) where
+  {-# INLINABLE def #-}
+  def = ElementConfig
+    { _elementConfig_namespace = Nothing
+    , _elementConfig_initialAttributes = mempty
+    , _elementConfig_modifyAttributes = Nothing
+    , _elementConfig_eventSpec = def
+    }
 
 instance (Reflex t, er ~ EventResult, DomSpace s) => Default (InputElementConfig er t s) where
   {-# INLINABLE def #-}

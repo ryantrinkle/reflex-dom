@@ -279,6 +279,15 @@ elementConfig_eventSpec f (ElementConfig a b c d) = (\d' -> ElementConfig a b c 
 {-# INLINE elementConfig_eventSpec #-}
 #endif
 
+instance (Reflex t, er ~ EventResult, DomSpace s) => Default (ElementConfig er t s) where
+  {-# INLINABLE def #-}
+  def = ElementConfig
+    { _elementConfig_namespace = Nothing
+    , _elementConfig_initialAttributes = mempty
+    , _elementConfig_modifyAttributes = Nothing
+    , _elementConfig_eventSpec = def
+    }
+
 data Element er d t
    = Element { _element_events :: EventSelector t (WrapArg er EventName) --TODO: EventSelector should have two arguments
              , _element_raw :: RawElement d
@@ -751,7 +760,7 @@ instance HasDocument m => HasDocument (QueryT t q m)
 class HasSetValue a where
   type SetValue a :: *
   setValue :: Lens' a (SetValue a)
-  
+
 instance Reflex t => HasSetValue (TextAreaElementConfig er t m) where
   type SetValue (TextAreaElementConfig er t m) = Event t Text
   setValue = textAreaElementConfig_setValue

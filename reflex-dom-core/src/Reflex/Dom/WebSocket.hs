@@ -8,7 +8,6 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE JavaScriptFFI #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
@@ -42,7 +41,6 @@ import Control.Exception
 import Control.Lens
 import Control.Monad hiding (forM, mapM, mapM_, sequence)
 import Control.Monad.IO.Class
-import Control.Monad.State
 import Data.Aeson
 import Data.ByteString (ByteString)
 import Data.ByteString.Lazy (toStrict)

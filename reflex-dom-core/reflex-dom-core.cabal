@@ -67,12 +67,12 @@ flag gc-tests
 library
   hs-source-dirs: src
   build-depends:
-    aeson >= 0.8 && < 2.2,
-    base >= 4.7 && < 4.19,
+    aeson >= 0.8 && < 2.3,
+    base >= 4.7 && < 4.20,
     bifunctors >= 4.2 && < 6,
     bimap >= 0.3 && < 0.6,
     blaze-builder >= 0.4.1 && < 0.5,
-    bytestring >= 0.10 && < 0.12,
+    bytestring >= 0.10 && < 0.13,
     case-insensitive < 1.3,
     commutative-semigroups >=0.1 && <0.3,
     containers >= 0.6 && < 0.7,
@@ -226,7 +226,7 @@ test-suite hydration
                , websockets
                , which
   hs-source-dirs: test
-  ghc-options: -rtsopts -with-rtsopts=-T -Wall -fwarn-tabs -funbox-strict-fields -O2 -ferror-spans
+  ghc-options: -rtsopts "-with-rtsopts=-T -V0" -Wall -fwarn-tabs -funbox-strict-fields -O2 -ferror-spans
   ghc-prof-options: -fprof-auto -optP-DPROFILING
   main-is: hydration.hs
   type: exitcode-stdio-1.0

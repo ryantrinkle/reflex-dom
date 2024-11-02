@@ -58,7 +58,7 @@ import Reflex.Profiled
 
 {-# INLINE mainHydrationWidgetWithHead #-}
 mainHydrationWidgetWithHead :: (forall x. HydrationWidget x ()) -> (forall x. HydrationWidget x ()) -> JSM ()
-mainHydrationWidgetWithHead = mainHydrationWidgetWithHead'
+mainHydrationWidgetWithHead head' body = mainHydrationWidgetWithHead' head' body
 
 {-# INLINABLE mainHydrationWidgetWithHead' #-}
 -- | Warning: `mainHydrationWidgetWithHead'` is provided only as performance tweak. It is expected to disappear in future releases.
@@ -67,7 +67,7 @@ mainHydrationWidgetWithHead' = mainHydrationWidgetWithSwitchoverAction' (pure ()
 
 {-# INLINE mainHydrationWidgetWithSwitchoverAction #-}
 mainHydrationWidgetWithSwitchoverAction :: JSM () -> (forall x. HydrationWidget x ()) -> (forall x. HydrationWidget x ()) -> JSM ()
-mainHydrationWidgetWithSwitchoverAction = mainHydrationWidgetWithSwitchoverAction'
+mainHydrationWidgetWithSwitchoverAction switchoverAction head' body = mainHydrationWidgetWithSwitchoverAction' switchoverAction head' body
 
 {-# INLINABLE mainHydrationWidgetWithSwitchoverAction' #-}
 -- | Warning: `mainHydrationWidgetWithSwitchoverAction'` is provided only as performance tweak. It is expected to disappear in future releases.
@@ -187,7 +187,7 @@ runHydrationWidgetWithHeadAndBodyWithFailure onFailure switchoverAction app = wi
 
 {-# INLINE mainWidget #-}
 mainWidget :: (forall x. Widget x ()) -> JSM ()
-mainWidget = mainWidget'
+mainWidget w = mainWidget' w
 
 {-# INLINABLE mainWidget' #-}
 -- | Warning: `mainWidget'` is provided only as performance tweak. It is expected to disappear in future releases.

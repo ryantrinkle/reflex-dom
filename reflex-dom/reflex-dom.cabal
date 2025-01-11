@@ -63,7 +63,7 @@ library
     build-depends:
       aeson >= 1.4 && < 2.3,
       android-activity == 0.2.*,
-      data-default == 0.7.*,
+      data-default >= 0.7 && < 0.9,
       jsaddle >= 0.9.6 && < 0.10
     c-sources: cbits/MainWidget.c
     include-dirs: cbits/include
@@ -71,11 +71,11 @@ library
     cpp-options: -DANDROID
     build-tools: hsc2hs
   build-depends:
-    base >= 4.7 && < 4.20,
+    base >= 4.7 && < 4.21,
     bytestring >= 0.10 && < 0.13,
     reflex >= 0.8 && < 1,
     reflex-dom-core >= 0.6.1.0 && <0.9,
-    text == 1.2.*
+    text >= 1.2 && < 2.2
   if !impl(ghcjs)
     if flag(use-warp)
       build-depends:
@@ -84,7 +84,7 @@ library
     else
       if os(osx) || os(ios)
         build-depends:
-          data-default == 0.7.*,
+          data-default >= 0.7 && < 0.9,
           jsaddle >= 0.9.6 && < 0.10,
           jsaddle-wkwebview >= 0.9.6 && < 0.10
       else

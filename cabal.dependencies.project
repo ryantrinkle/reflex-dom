@@ -1,0 +1,8 @@
+-- Exposed for importing by downstream projects
+
+-- unreleased ghc 9.10 support: https://github.com/ndmitchell/hlint/pull/1594
+if !arch(javascript)
+  source-repository-package
+    type: git
+    location: https://github.com/ndmitchell/hlint.git
+    tag: 05257f69f28a1593a2dcb65189150122cbcbce3f

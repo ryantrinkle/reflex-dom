@@ -64,6 +64,11 @@ flag gc-tests
   default: True
   manual: True
 
+flag hlint-tests
+  description: Whether to run the hlint tests
+  default: False
+  manual: True
+
 library
   hs-source-dirs: src
   build-depends:
@@ -184,6 +189,8 @@ test-suite hlint
   main-is: hlint.hs
   type: exitcode-stdio-1.0
   default-language: Haskell98
+  if !flag(hlint-tests)
+    buildable: False
 
 test-suite hydration
   build-depends: base

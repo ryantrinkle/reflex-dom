@@ -1,8 +1,13 @@
+import: cabal.dependencies.project
+
 packages:
   reflex-dom-core/
   reflex-dom/
   chrome-test-utils/
   reflex-dom-test-selenium/
+
+package reflex-dom-core
+  flags: +hlint-tests
 
 tests: True
 benchmarks: True

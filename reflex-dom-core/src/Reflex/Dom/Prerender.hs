@@ -30,11 +30,9 @@ import Control.Monad.Reader
 import Control.Monad.Ref (MonadRef(..), MonadAtomicRef(..))
 import Data.IORef (IORef, newIORef)
 import Data.Kind (Type)
-import Data.Semigroup (Semigroup)
 import Data.Semigroup.Commutative
 import Data.Text (Text)
 import Data.Void
-import Foreign.JavaScript.TH
 import GHCJS.DOM.Types (MonadJSM)
 import Reflex hiding (askEvents)
 import Reflex.Dom.Builder.Class

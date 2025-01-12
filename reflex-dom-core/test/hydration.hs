@@ -59,7 +59,6 @@ import Network.Socket
 import Network.Wai
 import Network.WebSockets
 import Reflex.Dom.Core
-import Reflex.Dom.Widget.Input (dropdown)
 import Reflex.Patch.DMapWithMove
 import System.Directory
 import System.Environment

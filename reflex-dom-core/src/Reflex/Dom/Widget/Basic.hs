@@ -70,14 +70,10 @@ import Reflex.Network
 import Reflex.PostBuild.Class
 import Reflex.Workflow
 
-import Control.Arrow
 import Control.Lens hiding (children, element)
 import Control.Monad.Fix
-import Control.Monad.Reader
 import Data.Align
 import Data.Default
-import Data.Either
-import Data.Foldable
 import Data.Functor (void)
 import Data.Kind (Type)
 import Data.Map (Map)
@@ -89,8 +85,6 @@ import qualified Data.Set as Set
 import Data.Text (Text)
 import qualified Data.Text as T
 import Data.These
-import Data.Traversable
-import Prelude hiding (mapM, mapM_, sequence, sequence_)
 
 -- | Breaks the given Map into pieces based on the given Set.  Each piece will contain only keys that are less than the key of the piece, and greater than or equal to the key of the piece with the next-smaller key.  There will be one additional piece containing all keys from the original Map that are larger or equal to the largest key in the Set.
 -- Either k () is used instead of Maybe k so that the resulting map of pieces is sorted so that the additional piece has the largest key.

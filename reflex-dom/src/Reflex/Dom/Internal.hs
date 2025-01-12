@@ -13,7 +13,6 @@ module Reflex.Dom.Internal
 
 import Data.ByteString (ByteString)
 import Data.Text (Text)
-import Reflex.Dom.Core (Widget)
 import Reflex.Dom.Main as Main hiding
        (mainWidget, mainWidgetWithHead, mainWidgetWithCss,
         mainWidgetWithHead', mainWidgetInElementById, runApp',
@@ -27,8 +26,6 @@ import qualified Reflex.Dom.Main as Main
 run :: a -> a
 run = id
 #elif defined(MIN_VERSION_jsaddle_warp)
-import Data.Maybe (maybe)
-import Data.Monoid ((<>))
 import Language.Javascript.JSaddle (JSM)
 import qualified Language.Javascript.JSaddle.Warp as JW
 import System.Environment (lookupEnv)

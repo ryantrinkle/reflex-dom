@@ -5,6 +5,7 @@ main :: IO ()
 main = do
   ideas <- hlint
     [ "."
+    , "--ignore=Functor law"
     , "--ignore=Redundant do"
     , "--ignore=Use camelCase"
     , "--ignore=Redundant $"

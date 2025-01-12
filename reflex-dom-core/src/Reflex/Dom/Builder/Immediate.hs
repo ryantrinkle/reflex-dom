@@ -131,7 +131,6 @@ import Data.Bitraversable
 import Data.Default
 import Data.Dependent.Map (DMap)
 import Data.Dependent.Sum
-import Data.FastMutableIntMap (PatchIntMap (..))
 import Data.Foldable (for_, traverse_)
 import Data.Functor.Compose
 import Data.Functor.Constant
@@ -140,8 +139,8 @@ import Data.Functor.Product
 import Data.GADT.Compare (GCompare)
 import Data.IORef
 import Data.IntMap.Strict (IntMap)
+import Data.Kind (Type)
 import Data.Maybe
-import Data.Monoid ((<>))
 import Data.Some (Some(..))
 import Data.String (IsString)
 import Data.Text (Text)
@@ -154,7 +153,7 @@ import GHCJS.DOM.EventM (EventM, event, on)
 import GHCJS.DOM.KeyboardEvent as KeyboardEvent
 import GHCJS.DOM.MouseEvent
 import GHCJS.DOM.Node (appendChild_, getOwnerDocumentUnchecked, getParentNodeUnchecked, setNodeValue, toNode)
-import GHCJS.DOM.Types (liftJSM, askJSM, runJSM, JSM, MonadJSM, FocusEvent, IsElement, IsEvent, IsNode, KeyboardEvent, Node, TouchEvent, WheelEvent, uncheckedCastTo, ClipboardEvent)
+import GHCJS.DOM.Types (liftJSM, askJSM, runJSM, JSM, MonadJSM, FocusEvent, IsElement, IsEvent, IsNode, Node, TouchEvent, WheelEvent, uncheckedCastTo)
 import GHCJS.DOM.UIEvent
 #ifndef ghcjs_HOST_OS
 import Language.Javascript.JSaddle (call, eval) -- Avoid using eval in ghcjs. Use ffi instead
@@ -164,7 +163,6 @@ import Reflex.Class as Reflex
 import Reflex.Dom.Builder.Class
 import Reflex.Dynamic
 import Reflex.Host.Class
-import Reflex.Patch.DMapWithMove (PatchDMapWithMove(..))
 import Reflex.Patch.MapWithMove (PatchMapWithMove(..))
 import Reflex.PerformEvent.Base (PerformEventT)
 import Reflex.PerformEvent.Class
@@ -466,7 +464,7 @@ removeSubsequentNodes :: (MonadJSM m, IsNode n) => n -> m ()
 #ifdef ghcjs_HOST_OS
 --NOTE: Although wrapping this javascript in a function seems unnecessary, GHCJS's optimizer will break it if it is entered without that wrapping (as of 2021-11-06)
 foreign import javascript unsafe
-#ifdef __GHCJS__
+#if __GLASGOW_HASKELL__ < 900
   "(function() { var n = $1; while (n['nextSibling']) { n['parentNode']['removeChild'](n['nextSibling']); }; })()"
 #else
   "(function(n) { while (n['nextSibling']) { n['parentNode']['removeChild'](n['nextSibling']); }; })"
@@ -493,7 +491,7 @@ extractBetweenExclusive :: (MonadJSM m, IsNode start, IsNode end) => DOM.Documen
 #ifdef ghcjs_HOST_OS
 --NOTE: Although wrapping this javascript in a function seems unnecessary, GHCJS's optimizer will break it if it is entered without that wrapping (as of 2021-11-06)
 foreign import javascript unsafe
-#ifdef __GHCJS__
+#if __GLASGOW_HASKELL__ < 900
   "(function() { var df = $1; var s = $2; var e = $3; var x; for(;;) { x = s['nextSibling']; if(e===x) { break; }; df['appendChild'](x); } })()"
 #else
   "(function(df, s, e) { var x; for(;;) { x = s['nextSibling']; if(e===x) { break; }; df['appendChild'](x); } })"
@@ -518,7 +516,7 @@ extractUpTo :: (MonadJSM m, IsNode start, IsNode end) => DOM.DocumentFragment ->
 #ifdef ghcjs_HOST_OS
 --NOTE: Although wrapping this javascript in a function seems unnecessary, GHCJS's optimizer will break it if it is entered without that wrapping (as of 2017-09-04)
 foreign import javascript unsafe
-#ifdef __GHCJS__
+#if __GLASGOW_HASKELL__ < 900
   "(function() { var x = $2; while(x !== $3) { var y = x['nextSibling']; $1['appendChild'](x); x = y; } })()"
 #else
   "(function(_, x, $3) { while(x !== $3) { var y = x['nextSibling']; $1['appendChild'](x); x = y; } })"
@@ -676,7 +674,7 @@ instance DomSpace GhcjsDomSpace where
 
 newtype GhcjsEventFilter er en = GhcjsEventFilter (GhcjsDomEvent en -> JSM (EventFlags, JSM (Maybe (er en))))
 
-data Pair1 (f :: k -> *) (g :: k -> *) (a :: k) = Pair1 (f a) (g a)
+data Pair1 (f :: k -> Type) (g :: k -> Type) (a :: k) = Pair1 (f a) (g a)
 
 data Maybe1 f a = Nothing1 | Just1 (f a)
 
@@ -1703,7 +1701,7 @@ instance (Adjustable t m, MonadJSM m, MonadHold t m, MonadFix m, PrimMonad m, Ra
 
 {-# INLINABLE traverseDMapWithKeyWithAdjust' #-}
 traverseDMapWithKeyWithAdjust'
-  :: forall s t m (k :: * -> *) v v'. (Adjustable t m, MonadHold t m, MonadFix m, MonadJSM m, PrimMonad m, GCompare k, RawDocument (DomBuilderSpace (HydrationDomBuilderT s t m)) ~ Document)
+  :: forall s t m (k :: Type -> Type) v v'. (Adjustable t m, MonadHold t m, MonadFix m, MonadJSM m, PrimMonad m, GCompare k, RawDocument (DomBuilderSpace (HydrationDomBuilderT s t m)) ~ Document)
   => (forall a. k a -> v a -> HydrationDomBuilderT s t m (v' a))
   -> DMap k v
   -> Event t (PatchDMap k v)

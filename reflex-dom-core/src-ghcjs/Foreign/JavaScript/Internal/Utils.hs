@@ -1,6 +1,8 @@
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE ForeignFunctionInterface #-}
+#ifdef __ghcjs_HOST_OS
 {-# LANGUAGE JavaScriptFFI #-}
+#endif
 
 module Foreign.JavaScript.Internal.Utils
   ( synchronously
@@ -10,7 +12,7 @@ module Foreign.JavaScript.Internal.Utils
 
 import GHCJS.Concurrent
 import GHCJS.DOM.Types (JSM, JSVal, RequestAnimationFrameCallback (..))
-#ifdef __GHCJS__
+#if __GLASGOW_HASKELL__ < 900
 import GHCJS.Foreign.Callback (releaseCallback)
 #else
 import GHC.JS.Foreign.Callback (releaseCallback)

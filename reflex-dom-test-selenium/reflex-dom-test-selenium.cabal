@@ -15,7 +15,7 @@ library
   hs-source-dirs: src
   build-depends:
     async,
-    base >= 4.7 && < 4.20,
+    base >= 4.7 && < 4.21,
     bytestring >= 0.10 && < 0.13,
     chrome-test-utils,
     exceptions,
@@ -28,7 +28,7 @@ library
     process,
     reflex-dom-core,
     silently,
-    text == 1.2.*,
+    text >= 1.2 && < 2.2,
     wai,
     warp,
     webdriver,

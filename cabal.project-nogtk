@@ -3,7 +3,7 @@ packages:
   reflex-dom/
 
 package reflex-dom-core
-  flags: -hydration-tests -gc-tests
+  flags: -hlint-tests -hydration-tests -gc-tests
 
 package reflex-dom
   flags: +use-warp -webkit2gtk

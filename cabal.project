@@ -3,3 +3,6 @@ packages:
   reflex-dom/
   chrome-test-utils/
   reflex-dom-test-selenium/
+
+tests: True
+benchmarks: True

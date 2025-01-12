@@ -54,6 +54,7 @@ import Control.Monad.State.Strict
 import Control.Monad.Trans.Control
 import Data.Default
 import Data.Functor.Misc
+import Data.Kind (Type)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Maybe
@@ -67,20 +68,20 @@ import GHCJS.DOM.Types (JSM)
 import qualified GHCJS.DOM.Types as DOM
 
 class Default (EventSpec d EventResult) => DomSpace d where
-  type EventSpec d :: (EventTag -> *) -> *
-  type RawDocument d :: *
-  type RawTextNode d :: *
-  type RawCommentNode d :: *
-  type RawElement d :: *
-  type RawInputElement d :: *
-  type RawTextAreaElement d :: *
-  type RawSelectElement d :: *
+  type EventSpec d :: (EventTag -> Type) -> Type
+  type RawDocument d :: Type
+  type RawTextNode d :: Type
+  type RawCommentNode d :: Type
+  type RawElement d :: Type
+  type RawInputElement d :: Type
+  type RawTextAreaElement d :: Type
+  type RawSelectElement d :: Type
   addEventSpecFlags :: proxy d -> EventName en -> (Maybe (er en) -> EventFlags) -> EventSpec d er -> EventSpec d er
 
 -- | @'DomBuilder' t m@ indicates that @m@ is a 'Monad' capable of building
 -- dynamic DOM in the 'Reflex' timeline @t@
 class (Monad m, Reflex t, DomSpace (DomBuilderSpace m), NotReady t m, Adjustable t m) => DomBuilder t m | m -> t where
-  type DomBuilderSpace m :: *
+  type DomBuilderSpace m :: Type
   textNode :: TextNodeConfig t -> m (TextNode (DomBuilderSpace m) t)
   default textNode :: ( MonadTrans f
                       , m ~ f m'
@@ -160,7 +161,7 @@ class (Monad m, Reflex t, DomSpace (DomBuilderSpace m), NotReady t m, Adjustable
   {-# INLINABLE wrapRawElement #-}
 
 class DomBuilder t m => MountableDomBuilder t m where
-  type DomFragment m :: *
+  type DomFragment m :: Type
   buildDomFragment :: m a -> m (DomFragment m, a)
   mountDomFragment :: DomFragment m -> Event t (DomFragment m) -> m ()
 
@@ -642,7 +643,7 @@ instance (DomBuilder t m, MonadFix m, MonadHold t m, Group q, Query q, Commutati
 -- * Convenience functions
 
 class HasDomEvent t target eventName | target -> t where
-  type DomEventType target eventName :: *
+  type DomEventType target eventName :: Type
   domEvent :: EventName eventName -> target -> Event t (DomEventType target eventName)
 
 instance Reflex t => HasDomEvent t (Element EventResult d t) en where
@@ -749,7 +750,7 @@ instance HasDocument m => HasDocument (RequesterT t request response m)
 instance HasDocument m => HasDocument (QueryT t q m)
 
 class HasSetValue a where
-  type SetValue a :: *
+  type SetValue a :: Type
   setValue :: Lens' a (SetValue a)
 
 instance Reflex t => HasSetValue (TextAreaElementConfig er t m) where

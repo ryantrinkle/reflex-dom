@@ -15,6 +15,7 @@ import Data.Type.Equality ((:~:)(..))
 import Data.GADT.Compare
        (GOrdering(..), GEq(..), GCompare(..))
 #endif
+import Data.Kind (Type)
 import Data.Text (Text)
 
 data EventTag
@@ -65,7 +66,7 @@ data EventTag
    | TouchendTag
    | TouchcancelTag
 
-data EventName :: EventTag -> * where
+data EventName :: EventTag -> Type where
   Abort :: EventName 'AbortTag
   Blur :: EventName 'BlurTag
   Change :: EventName 'ChangeTag
@@ -115,7 +116,7 @@ data EventName :: EventTag -> * where
 
 newtype EventResult en = EventResult { unEventResult :: EventResultType en }
 
-type family EventResultType (en :: EventTag) :: * where
+type family EventResultType (en :: EventTag) :: Type where
   EventResultType 'ClickTag = ()
   EventResultType 'DblclickTag = (Int, Int)
   EventResultType 'KeypressTag = Word

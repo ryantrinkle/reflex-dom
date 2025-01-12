@@ -1,6 +1,6 @@
 cabal-version: 1.24
 Name: reflex-dom-core
-Version: 0.8.1.0
+Version: 0.8.1.1
 Synopsis: Functional Reactive Web Apps with Reflex
 Description:
   Web applications without callbacks or side-effects.
@@ -184,7 +184,8 @@ library
 test-suite hlint
   build-depends:
     base,
-    hlint >= 2.0 && < 4.0
+    hlint >= 2.0 && < 4.0,
+    reflex-dom-core
   hs-source-dirs: test
   main-is: hlint.hs
   type: exitcode-stdio-1.0

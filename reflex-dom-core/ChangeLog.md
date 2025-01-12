@@ -1,5 +1,8 @@
 # Revision history for reflex-dom-core
 
+## 0.8.1.1
+* Support GHC 9.10
+
 ## 0.8.1.0
 
 * Add functions for managing history (popHistoryState and manageHistoryExposingExternalUpdates)

@@ -11,6 +11,7 @@
 {-# LANGUAGE RecursiveDo #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE UndecidableSuperClasses #-}
 
@@ -22,15 +23,16 @@ module Reflex.Dom.Prerender
        , PrerenderBaseConstraints
        ) where
 
+import Control.Monad
+import Control.Monad.Fix
 import Control.Monad.Primitive (PrimMonad(..))
 import Control.Monad.Reader
 import Control.Monad.Ref (MonadRef(..), MonadAtomicRef(..))
 import Data.IORef (IORef, newIORef)
-import Data.Semigroup (Semigroup)
+import Data.Kind (Type)
 import Data.Semigroup.Commutative
 import Data.Text (Text)
 import Data.Void
-import Foreign.JavaScript.TH
 import GHCJS.DOM.Types (MonadJSM)
 import Reflex hiding (askEvents)
 import Reflex.Dom.Builder.Class
@@ -80,7 +82,7 @@ prerender_ server client = void $ prerender server client
 
 class (PrerenderClientConstraint t (Client m), Client (Client m) ~ Client m, Prerender t (Client m)) => Prerender t m | m -> t where
   -- | Monad in which the client widget is built
-  type Client m :: * -> *
+  type Client m :: Type -> Type
   -- | Render the first widget on the server, and the second on the client. The
   -- hydration builder will run *both* widgets, updating the result dynamic at
   -- switchover time.

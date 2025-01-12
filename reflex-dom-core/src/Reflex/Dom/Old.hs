@@ -11,6 +11,7 @@
 #ifdef USE_TEMPLATE_HASKELL
 {-# LANGUAGE TemplateHaskell #-}
 #endif
+{-# LANGUAGE TypeOperators #-}
 module Reflex.Dom.Old
        ( MonadWidget
        , El

@@ -1,5 +1,8 @@
 # Revision history for reflex-dom-core
 
+## 0.8.1.2
+* Support GHC 9.12
+
 ## 0.8.1.1
 * Support GHC 9.10
 

@@ -73,7 +73,7 @@ library
   hs-source-dirs: src
   build-depends:
     aeson >= 0.8 && < 2.3,
-    base >= 4.7 && < 4.21,
+    base >= 4.7 && < 4.22,
     bifunctors >= 4.2 && < 6,
     bimap >= 0.3 && < 0.6,
     blaze-builder >= 0.4.1 && < 0.5,
@@ -175,7 +175,7 @@ library
   if flag(use-template-haskell)
     build-depends:
       dependent-sum-template >= 0.1 && < 0.3,
-      template-haskell >= 2.12.0 && < 2.23
+      template-haskell >= 2.12.0 && < 2.24
     other-extensions: TemplateHaskell
     cpp-options: -DUSE_TEMPLATE_HASKELL
     other-modules:

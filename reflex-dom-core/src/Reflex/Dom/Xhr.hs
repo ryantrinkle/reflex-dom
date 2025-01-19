@@ -1,5 +1,4 @@
 {-# LANGUAGE CPP #-}
-{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GADTs #-}
@@ -174,7 +173,6 @@ import Data.Text.Encoding
 import qualified Data.Text.Lazy as LT
 import qualified Data.Text.Lazy.Builder as B
 import Data.Traversable
-import Data.Typeable
 
 import Language.Javascript.JSaddle.Monad (JSM, askJSM, runJSM, MonadJSM, liftJSM)
 
@@ -183,7 +181,7 @@ data XhrRequest a
                 , _xhrRequest_url :: Text
                 , _xhrRequest_config :: XhrRequestConfig a
                 }
-   deriving (Show, Read, Eq, Ord, Typeable, Functor)
+   deriving (Show, Read, Eq, Ord, Functor)
 
 data XhrRequestConfig a
    = XhrRequestConfig { _xhrRequestConfig_headers :: Map Text Text
@@ -194,7 +192,7 @@ data XhrRequestConfig a
                       , _xhrRequestConfig_withCredentials :: Bool
                       , _xhrRequestConfig_responseHeaders :: XhrResponseHeaders
                       }
-   deriving (Show, Read, Eq, Ord, Typeable, Functor)
+   deriving (Show, Read, Eq, Ord, Functor)
 
 data XhrResponse
    = XhrResponse { _xhrResponse_status :: Word
@@ -203,12 +201,11 @@ data XhrResponse
                  , _xhrResponse_responseText :: Maybe Text
                  , _xhrResponse_headers :: Map (CI Text) Text
                  }
-   deriving (Typeable)
 
 data XhrResponseHeaders =
     OnlyHeaders (Set.Set (CI Text)) -- ^ Parse a subset of headers from the XHR Response
   | AllHeaders -- ^ Parse all headers from the XHR Response
-  deriving (Show, Read, Eq, Ord, Typeable)
+  deriving (Show, Read, Eq, Ord)
 
 instance Default XhrResponseHeaders where
   def = OnlyHeaders mempty

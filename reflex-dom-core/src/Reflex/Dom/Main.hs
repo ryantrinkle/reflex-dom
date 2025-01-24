@@ -166,6 +166,7 @@ runHydrationWidgetWithHeadAndBodyWithFailure onFailure switchoverAction app = wi
         hydrateDom n w = do
           delayed <- liftIO $ newIORef $ pure ()
           unreadyChildren <- liftIO $ newIORef 0
+          renderInFrame <- hold Synchronous $ RenderInFrame <$ switchover
           lift $ do
             let builderEnv = HydrationDomBuilderEnv
                   { _hydrationDomBuilderEnv_document = globalDoc
@@ -175,6 +176,7 @@ runHydrationWidgetWithHeadAndBodyWithFailure onFailure switchoverAction app = wi
                   , _hydrationDomBuilderEnv_hydrationMode = hydrationMode
                   , _hydrationDomBuilderEnv_switchover = switchover
                   , _hydrationDomBuilderEnv_delayed = delayed
+                  , _hydrationDomBuilderEnv_renderInFrame = renderInFrame
                   }
             a <- runHydrationDomBuilderT w builderEnv events
             forM_ hydrationResult $ \hr -> do
@@ -269,6 +271,7 @@ runImmediateWidgetWithHeadAndBody app = withJSContextSingletonMono $ \jsSing -> 
                 , _hydrationDomBuilderEnv_hydrationMode = hydrationMode
                 , _hydrationDomBuilderEnv_switchover = never
                 , _hydrationDomBuilderEnv_delayed = delayed
+		, _hydrationDomBuilderEnv_renderInFrame = constant RenderInFrame
                 }
           lift $ runHydrationDomBuilderT w builderEnv events
     runWithJSContextSingleton (runPostBuildT (runTriggerEventT (app (go headFragment) (go bodyFragment)) events) postBuild) jsSing
@@ -307,6 +310,7 @@ attachWidget' rootElement jsSing w = do
           , _hydrationDomBuilderEnv_switchover = never
           , _hydrationDomBuilderEnv_delayed = delayed
           , _hydrationDomBuilderEnv_hydrationMode = hydrationMode
+	  , _hydrationDomBuilderEnv_renderInFrame = constant RenderInFrame
           }
     a <- runWithJSContextSingleton (runPostBuildT (runHydrationDomBuilderT w builderEnv events) postBuild) jsSing
     return ((a, events), postBuildTriggerRef)

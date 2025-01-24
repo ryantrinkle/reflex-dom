@@ -117,6 +117,7 @@ instance (Adjustable t m, PrerenderBaseConstraints t m, ReflexHost t) => Prerend
           , _hydrationDomBuilderEnv_delayed = delayed
           , _hydrationDomBuilderEnv_hydrationMode = immediateMode
           , _hydrationDomBuilderEnv_switchover = never
+          , _hydrationDomBuilderEnv_renderInFrame = constant Synchronous
           }
     a0 <- lift $ runHydrationDomBuilderT server serverEnv events
     (a', trigger) <- newTriggerEvent

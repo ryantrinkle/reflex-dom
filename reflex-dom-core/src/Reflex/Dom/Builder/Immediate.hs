@@ -51,6 +51,7 @@ module Reflex.Dom.Builder.Immediate
   , runHydrationRunnerTWithFailure
   , ImmediateDomBuilderT
   , runHydrationDomBuilderT
+  , ShouldRenderInFrame (..)
   , getHydrationMode
   , addHydrationStep
   , addHydrationStepWithSetup
@@ -242,6 +243,7 @@ data HydrationDomBuilderEnv t m = HydrationDomBuilderEnv
   -- ^ In hydration mode? Should be switched to `HydrationMode_Immediate` after hydration is finished
   , _hydrationDomBuilderEnv_switchover :: !(Event t ())
   , _hydrationDomBuilderEnv_delayed :: {-# UNPACK #-} !(IORef (HydrationRunnerT t m ()))
+  , _hydrationDomBuilderEnv_renderInFrame :: !(Behavior t ShouldRenderInFrame)
   }
 
 -- | A monad for DomBuilder which just gets the results of children and pushes
@@ -301,7 +303,7 @@ runHydrationRunnerT m = runHydrationRunnerTWithFailure m (pure ())
 runHydrationRunnerTWithFailure
   :: (MonadRef m, Ref m ~ IORef, Monad m, PerformEvent t m, MonadFix m, MonadReflexCreateTrigger t m, MonadJSM m, MonadJSM (Performable m))
   => HydrationRunnerT t m a -> IO () -> Maybe Node -> Node -> Chan [DSum (EventTriggerRef t) TriggerInvocation] -> m a
-runHydrationRunnerTWithFailure (HydrationRunnerT m) onFailure s parent events = flip runDomRenderHookT events $ flip runReaderT parent $ do
+runHydrationRunnerTWithFailure (HydrationRunnerT m) onFailure s parent events = (\e f -> runDomRenderHookT f (constant RenderInFrame) e) events $ flip runReaderT parent $ do
   (a, s') <- runStateT m (HydrationState s False)
   traverse_ removeSubsequentNodes $ _hydrationState_previousNode s'
   when (_hydrationState_failed s') $ liftIO $ putStrLn "reflex-dom warning: hydration failed: the DOM was not as expected at switchover time. This may be due to invalid HTML which the browser has altered upon parsing, some external JS altering the DOM, or the page being served from an outdated cache."
@@ -355,19 +357,25 @@ newtype DomRenderHookT t m a = DomRenderHookT { unDomRenderHookT :: RequesterT t
 #endif
            )
 
+data ShouldRenderInFrame = Synchronous | RenderInFrame
+
 {-# INLINABLE runDomRenderHookT #-}
 runDomRenderHookT
   :: (MonadFix m, PerformEvent t m, MonadReflexCreateTrigger t m, MonadJSM m, MonadJSM (Performable m), MonadRef m, Ref m ~ IORef)
   => DomRenderHookT t m a
+  -> Behavior t ShouldRenderInFrame
   -> Chan [DSum (EventTriggerRef t) TriggerInvocation]
   -> m a
-runDomRenderHookT (DomRenderHookT a) events = do
+runDomRenderHookT (DomRenderHookT a) renderInFrame events = do
   flip runTriggerEventT events $ do
     rec (result, req) <- runRequesterT a rsp
-        rsp <- performEventAsync $ ffor req $ \rm f -> liftJSM $ runInAnimationFrame f $
+        rsp <- performEventAsync $ ffor (attach renderInFrame req) $ \(should, rm) f -> liftJSM $ runInAnimationFrameIf should f $
           traverseRequesterData (fmap Identity) rm
     return result
   where
+    runInAnimationFrameIf Synchronous = runWithoutAnimationFrame
+    runInAnimationFrameIf RenderInFrame = runInAnimationFrame
+    runWithoutAnimationFrame f x = x >>= liftIO . f
     runInAnimationFrame f x = void . DOM.inAnimationFrame' $ \_ -> do
         v <- synchronously x
         void . liftIO $ f v
@@ -398,7 +406,7 @@ runHydrationDomBuilderT
   -> HydrationDomBuilderEnv t m
   -> Chan [DSum (EventTriggerRef t) TriggerInvocation]
   -> m a
-runHydrationDomBuilderT (HydrationDomBuilderT a) env = runDomRenderHookT (runReaderT a env)
+runHydrationDomBuilderT (HydrationDomBuilderT a) env = runDomRenderHookT (runReaderT a env) (_hydrationDomBuilderEnv_renderInFrame env)
 
 instance (RawDocument (DomBuilderSpace (HydrationDomBuilderT s t m)) ~ Document, Monad m) => HasDocument (HydrationDomBuilderT s t m) where
   {-# INLINABLE askDocument #-}
